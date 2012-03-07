@@ -33,6 +33,6 @@ public class Words {
             if (word.length() == len)
                 foundWords.add(word);
         }
-        return (String[]) foundWords.toArray();
+        return foundWords.toArray(new String[foundWords.size()]);
     }
 }
