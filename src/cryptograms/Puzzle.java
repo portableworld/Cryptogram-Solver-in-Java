@@ -1,4 +1,3 @@
-
 package cryptograms;
 
 import java.util.ArrayList;
@@ -84,6 +83,37 @@ public class Puzzle {
                 matches.add(word);
         }
         return matches;
+    }
+    
+    private String[] sortWordsByLength(String[] wordsArray) {
+        ArrayList<String> wordsList = new ArrayList<String>();
+        String[] sortedWordsArray = new String[wordsArray.length];
+        wordsList.addAll(Arrays.asList(wordsArray));
+        
+        for (int i = 0; i < wordsArray.length; i++) {
+            String word = getLongestWord(
+                    wordsList.toArray(new String[wordsList.size()]));
+            if (word.length() == 1) {oneLetterWord = word;}
+            sortedWordsArray[i] = word;
+            wordsList.remove(word);
+        }
+        return sortedWordsArray;
+    } 
+    
+    private boolean checkAlphabet(Alphabet alpha) {
+        boolean result;
+        
+        if (alpha.containsEncryptedLetter(oneLetterWord)) {
+            String letter = alpha.getLetter(oneLetterWord);
+            if (letter.equals("a") || letter.equals("i"))
+                result = true;
+            else
+                result = false;
+        } else {
+            result = true;
+        }
+        
+        return result;
     }
     
 }
