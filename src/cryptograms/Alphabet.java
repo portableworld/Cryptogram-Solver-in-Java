@@ -1,4 +1,3 @@
-
 package cryptograms;
 
 import java.util.HashMap;
@@ -15,6 +14,14 @@ public class Alphabet {
     
     public void solveLetter(String encrypted, String decrypted) {
         letters.put(encrypted, decrypted);
+    }
+    
+    public String getLetter(String encrypted) {
+        return letters.get(encrypted);
+    }
+    
+    public boolean containsEncryptedLetter(String encrypted) {
+        return letters.containsKey(encrypted);
     }
     
     public boolean testWordsWith(String encrypted, String decrypted) {
