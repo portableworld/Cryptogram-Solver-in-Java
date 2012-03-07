@@ -1,6 +1,8 @@
 
 package cryptograms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +23,25 @@ public class Puzzle {
     
     public String solvePuzzle() {
         String longestWord = getLongestWord();
-        Words dict = new Words();
-        String[] possibleMatches = dict.getWordsOfLength(longestWord.length());
+        int[] longestWordPattern = findWordPattern(longestWord);
         
+        ArrayList<String> matches = getMatches(longestWord, longestWordPattern);
+        
+        System.out.printf("Possible matches for %s:\n", longestWord);
+        for (String word : matches) {
+            System.out.println(word);
+        }
+        
+        Alphabet alpha1 = new Alphabet();
+        for (int i = 0; i < longestWord.length(); i++) {
+            alpha1.solveLetter(longestWord.substring(i, i+1), 
+                    matches.get(0).substring(i, i+1));
+        }
+        
+        if (alpha1.testWordsWith("gsatkb", "mother"))
+            System.out.println("'mother' could be the answer");
+        else
+            System.out.println("'mother' is not the answer");
         return null;
     }
     
@@ -55,5 +73,17 @@ public class Puzzle {
         return longestWord;
     } // End Method
     
+    private ArrayList<String> getMatches(String longestWord, 
+            int[] longestWordPattern) {
+        Words dict = new Words();
+        String[] possibleMatches = dict.getWordsOfLength(longestWord.length());
+        ArrayList<String> matches = new ArrayList<String>();
+        for (String word : possibleMatches) {
+            int[] wordPattern = findWordPattern(word);
+            if (Arrays.equals(wordPattern, longestWordPattern)) 
+                matches.add(word);
+        }
+        return matches;
+    }
     
 }
