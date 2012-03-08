@@ -12,6 +12,10 @@ public class Alphabet {
     
     public Alphabet() {}
     
+    public Alphabet(Alphabet otherAlphabet) {
+        letters.putAll(otherAlphabet.letters);
+    }
+    
     public void solveLetter(String encrypted, String decrypted) {
         letters.put(encrypted, decrypted);
     }
@@ -22,6 +26,17 @@ public class Alphabet {
     
     public boolean containsEncryptedLetter(String encrypted) {
         return letters.containsKey(encrypted);
+    }
+    
+    public boolean compare(Alphabet otherAlphabet) {
+        for (String letter : otherAlphabet.letters.keySet()) {
+            // If both letter maps contain the same key but different
+            // values, return false. Otherwise, keep testing
+            if (letters.containsKey(letter) && 
+                    !(letters.get(letter).equals(otherAlphabet.letters.get(letter))))
+                return false;
+        }
+        return true;
     }
     
     public boolean testWordsWith(String encrypted, String decrypted) {
