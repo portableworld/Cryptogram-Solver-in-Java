@@ -1,5 +1,6 @@
 package cryptograms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +38,27 @@ public class Alphabet {
                 return false;
         }
         return true;
+    }
+    
+    public boolean containsDuplicateValues() {
+        String[] all = letters.values().toArray(new String[letters.size()]);
+        for (String letter : all) {
+            int count = 0;
+            for (int i = 0; i < all.length; i++) {
+                if (all[i].equals(letter))
+                    count++;
+            }
+            if (count > 1)
+                return false;
+        }
+        return true;
+    }
+    
+    public void combine(Alphabet otherAlphabet) {
+        for (String letter : otherAlphabet.letters.keySet()) {
+            if (!letters.containsKey(letter))
+                letters.put(letter, otherAlphabet.letters.get(letter));
+        }
     }
     
     public boolean testWordsWith(String encrypted, String decrypted) {
