@@ -13,35 +13,101 @@ public class Puzzle {
     public String puzzle;
     public String[] words;
     public String solution;
+    public String oneLetterWord;
+    public Alphabet theAnswer;
+    private int checkedCount;
     
     public Puzzle(String puzzleText) {
         puzzle = puzzleText;
         words = puzzle.split(" ");
         solution = "";
+        oneLetterWord = null;
     }
     
     public String solvePuzzle() {
-        String longestWord = getLongestWord();
-        int[] longestWordPattern = findWordPattern(longestWord);
         
-        ArrayList<String> matches = getMatches(longestWord, longestWordPattern);
+        String[] sortedWords = sortWordsByLength(words);
+        ArrayList<Alphabet> alphas = new ArrayList<Alphabet>();
         
-        System.out.printf("Possible matches for %s:\n", longestWord);
-        for (String word : matches) {
-            System.out.println(word);
+        for (String encryptedWord : sortedWords) {
+            int[] patternedWord = findWordPattern(encryptedWord);
+            ArrayList<String> possibleMatches = getMatches(encryptedWord, patternedWord);
+            
+            if (alphas.isEmpty()) {
+                // Build Alphabets from possibleMatches
+                for (String match : possibleMatches) {
+                    Alphabet alpha = new Alphabet();
+                    for (int i = 0; i < encryptedWord.length(); i++) {
+                        alpha.solveLetter(encryptedWord.substring(i, i+1), 
+                                match.substring(i, i+1));
+                        
+                    }
+                    alphas.add(alpha);
+                    if (alpha.containsEncryptedLetter(oneLetterWord) && 
+                            !(alpha.getLetter(oneLetterWord).equals("a") || 
+                            alpha.getLetter(oneLetterWord).equals("i")))
+                    alphas.remove(alpha);
+                 
+                }
+                for (Alphabet alphabet : alphas) {
+                    if (solveWithRecursion(
+                            Arrays.copyOfRange(sortedWords, 1, sortedWords.length), alphabet)) {
+                        solution = theAnswer.solvePuzzleWith(puzzle);
+                        return solution;
+                    }
+                }
+            } else if (alphas.size() == 1) {
+                // This Alphabet is the answer. Solve and return puzzle
+                break;
+            } else {
+                // Check possible match against all possible Alphabets and combine
+                System.out.println("Word: " + encryptedWord);
+                ArrayList<String> matches = new ArrayList<String>();
+                for (String pm : possibleMatches) {
+                    if (alphas.get(0).testWordsWith(encryptedWord, pm))
+                        matches.add(pm);
+                }
+                System.out.println("Possible solutions: " + matches.size());
+            }
         }
         
-        Alphabet alpha1 = new Alphabet();
-        for (int i = 0; i < longestWord.length(); i++) {
-            alpha1.solveLetter(longestWord.substring(i, i+1), 
-                    matches.get(0).substring(i, i+1));
+        if (alphas.size() == 1) {
+            // Solve puzzle
+        } else {
+            solution = "Could not solve puzzle. There are " + alphas.size() +
+                    " possible solutions.";
         }
         
-        if (alpha1.testWordsWith("gsatkb", "mother"))
-            System.out.println("'mother' could be the answer");
-        else
-            System.out.println("'mother' is not the answer");
-        return null;
+        return solution;
+    }
+    
+    private boolean solveWithRecursion(String[] sortedWords, Alphabet alphabet) {
+        if (sortedWords.length == 1) {
+            theAnswer = alphabet;
+            return true;
+        }
+        
+        int[] patternedWord = findWordPattern(sortedWords[0]);
+         ArrayList<String> possibleMatches = getMatches(sortedWords[0], patternedWord);
+         
+         for (String match : possibleMatches) {
+             Alphabet alpha = new Alphabet();
+             for (int i = 0; i < sortedWords[0].length(); i++) {
+                alpha.solveLetter(sortedWords[0].substring(i, i+1), 
+                        match.substring(i, i+1));      
+             }
+             if (alpha.compare(alphabet)) {
+                 checkedCount++;
+                 System.out.println("Checked " + checkedCount + " words");
+                 alpha.combine(alphabet);
+                 if (alpha.containsDuplicateValues())
+                     continue;
+                 if (solveWithRecursion(Arrays.copyOfRange(sortedWords, 1, sortedWords.length), 
+                         new Alphabet(alpha))) 
+                    return true;
+             }
+        }
+         return false;
     }
     
     private int[] findWordPattern(String word) {
@@ -60,10 +126,10 @@ public class Puzzle {
         return pattern;
     } // End Method
 
-    private String getLongestWord() {
+    private String getLongestWord(String[] wordArray) {
         int len = 0;
         String longestWord = "";
-        for (String word : words) {
+        for (String word : wordArray) {
             if (word.length() > len) {
                 len = word.length();
                 longestWord = word;
@@ -72,14 +138,14 @@ public class Puzzle {
         return longestWord;
     } // End Method
     
-    private ArrayList<String> getMatches(String longestWord, 
-            int[] longestWordPattern) {
+    private ArrayList<String> getMatches(String encryptedWord, 
+            int[] patternedWord) {
         Words dict = new Words();
-        String[] possibleMatches = dict.getWordsOfLength(longestWord.length());
+        String[] possibleMatches = dict.getWordsOfLength(encryptedWord.length());
         ArrayList<String> matches = new ArrayList<String>();
         for (String word : possibleMatches) {
             int[] wordPattern = findWordPattern(word);
-            if (Arrays.equals(wordPattern, longestWordPattern)) 
+            if (Arrays.equals(wordPattern, patternedWord)) 
                 matches.add(word);
         }
         return matches;
