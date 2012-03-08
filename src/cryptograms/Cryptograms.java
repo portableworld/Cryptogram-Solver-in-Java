@@ -14,6 +14,6 @@ public class Cryptograms {
         Puzzle puzzle = new Puzzle("gebo tev e cwaack cegn gsatkb ussyk");
         // When solved,  should be "mary had a little lamb mother goose"
         puzzle.solvePuzzle();
-        
+        System.out.println(puzzle.solution);
     }
 }
