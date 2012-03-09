@@ -25,6 +25,7 @@ public class Puzzle {
     }
     
     public String solvePuzzle() {
+        // Personal Note: 'e' is the most frequently used letter is a probibility of 12.7%
         
         String[] sortedWords = sortWordsByLength(words);
         ArrayList<Alphabet> alphas = new ArrayList<Alphabet>();
